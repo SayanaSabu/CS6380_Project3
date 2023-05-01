@@ -26,9 +26,12 @@ public class Node {
         this.UID = UID;
     }
 
-    // public void addChildNode(int childUID) {
-    // this.childNodes.add(childUID);
-    // }
+    public void addChildNode(int childUID) {
+        Node childNode = this.neighbours.get(childUID);
+        this.childNodes.add(childNode);
+
+        System.out.println("Child node for " + this.UID + " is " + childUID);
+    }
 
     public void addNeighbour(Node neighbour) {
         this.neighbours.put(neighbour.getUID(), neighbour);
@@ -91,9 +94,9 @@ public class Node {
         return this.port;
     }
 
-    // public List<Message> getReceivedMessages() {
-    // return this.receivedMessages;
-    // }
+    public List<Message> getReceivedMessages() {
+        return this.receivedMessages;
+    }
 
     public int getTreeDepth() {
         return this.depth;
@@ -155,6 +158,8 @@ public class Node {
     public void setParent(int parentUID, int rootTreeDepth) {
         this.parentUID = parentUID;
         this.treeLevel = rootTreeDepth + 1;
+
+        System.out.println("Parent node for " + this.UID + " is " + parentUID);
     }
 
     // public void setVisited(boolean visited) {

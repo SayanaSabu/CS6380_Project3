@@ -1,5 +1,6 @@
 public class LayeredBFS {
     private Node currNode;
+    private int searchAckNeighboursCount = 0;
 
     public LayeredBFS(Node currNode) {
         this.currNode = currNode;
@@ -18,7 +19,7 @@ public class LayeredBFS {
         }
     }
 
-    public void handleIncomingMessages() {
+    private void handleIncomingMessages() {
         Message currMessage = this.currNode.popLatestReceivedMessage();
         if (currMessage.getSenderUID() == -1)
             return;
@@ -28,12 +29,25 @@ public class LayeredBFS {
                 this.handleSearchMessage(currMessage);
                 break;
 
+            case LAYERED_BFS_SEARCH_ACK_ACCEPTED:
+            case LAYERED_BFS_SEARCH_ACK_REJECTED:
+                this.handleSearchAckMessage(currMessage);
+                break;
+
             default:
-                this.currNode.addReceivedMessage(currMessage);
+                return;
         }
     }
 
-    public void handleSearchMessage(Message msg) {
+    private void handleSearchAckMessage(Message msg) {
+        this.searchAckNeighboursCount += 1;
+
+        if (msg.getType() == Message.MessageType.LAYERED_BFS_SEARCH_ACK_ACCEPTED) {
+            this.currNode.addChildNode(msg.getSenderUID());
+        }
+    }
+
+    private void handleSearchMessage(Message msg) {
         Message.MessageType type = Message.MessageType.LAYERED_BFS_SEARCH_ACK_REJECTED;
 
         if (this.currNode.getParentUID() == -1) {
@@ -45,7 +59,7 @@ public class LayeredBFS {
         this.currNode.messageParent(reply);
     }
 
-    public void sendSearch() {
+    private void sendSearch() {
         Message msg = new Message(
                 this.currNode.getUID(),
                 Message.MessageType.LAYERED_BFS_SEARCH,

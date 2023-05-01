@@ -25,8 +25,6 @@ public class TCPServer extends Thread {
 
                     if (message.getType() != Message.MessageType.HANDSHAKE) {
                         this.serverNode.addReceivedMessage(message);
-                    } else {
-                        System.out.println("Received HANDSHAKE from " + message.getSenderUID());
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
