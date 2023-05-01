@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReadConfig {
-    public static Node read(String currHostName) throws Exception {
+    public static Node read(int currNodeUID) throws Exception {
         FileReader fr = new FileReader(
                 "./config.txt");
         BufferedReader br = new BufferedReader(fr);
@@ -70,7 +70,7 @@ public class ReadConfig {
 
         Node currNode = new Node();
         for (Map.Entry<Integer, Node> e : nodeMap.entrySet()) {
-            if (currHostName.equals(e.getValue().getHostName())) {
+            if (e.getValue().getUID() == currNodeUID) {
                 currNode = e.getValue();
             }
         }

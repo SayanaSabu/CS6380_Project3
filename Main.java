@@ -1,10 +1,8 @@
-import java.net.InetAddress;
-
 public class Main {
     public static void main(String[] args) {
         try {
-            String currHostName = InetAddress.getLocalHost().getHostName();
-            Node currNode = ReadConfig.read(currHostName);
+            int currNodeUID = Integer.parseInt(args[0]);
+            Node currNode = ReadConfig.read(currNodeUID);
 
             System.out.println("UID: " + currNode.getUID());
             System.out.println("Hostname: " + currNode.getHostName());
