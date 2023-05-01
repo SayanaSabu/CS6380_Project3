@@ -29,7 +29,7 @@ public class Main {
             for (TCPClient client : currNode.getNeighbourClients()) {
                 client.closeConnection();
             }
-            server.stopListening();
+            server.interrupt();
 
         } catch (Exception e) {
             e.printStackTrace();

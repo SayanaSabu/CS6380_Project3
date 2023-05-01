@@ -5,7 +5,6 @@ import java.net.Socket;
 
 public class TCPServer extends Thread {
     private Node serverNode;
-    private volatile boolean shouldStop = false;
 
     public TCPServer(Node serverNode) {
         this.serverNode = serverNode;
@@ -21,7 +20,7 @@ public class TCPServer extends Thread {
 
             System.out.println("Server online with UID: " + this.serverNode.getUID());
 
-            while (!this.shouldStop) {
+            while (!Thread.currentThread().isInterrupted()) {
                 Socket connectionSocket = serverSocket.accept();
                 ObjectInputStream ois = new ObjectInputStream(connectionSocket.getInputStream());
 
@@ -41,12 +40,10 @@ public class TCPServer extends Thread {
                 connectionSocket.close();
             }
 
+            serverSocket.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void stopListening() {
-        this.shouldStop = true;
     }
 }
