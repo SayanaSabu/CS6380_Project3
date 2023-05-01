@@ -46,10 +46,6 @@ public class Node {
         }
     }
 
-    public boolean areAllNeighboursOnline() {
-        return this.neighbours.size() == this.neighbourClients.size();
-    }
-
     // public void endLeaderElection(int leaderUID) {
     // this.leaderUID = leaderUID;
     // this.receivedMessages.clear();
@@ -81,9 +77,9 @@ public class Node {
         return this.hostName;
     }
 
-    // public List<TCPClient> getNeighbourClients() {
-    // return this.neighbourClients;
-    // }
+    public List<TCPClient> getNeighbourClients() {
+        return this.neighbourClients;
+    }
 
     public ArrayList<Node> getNeighbourNodes() {
         return this.neighbours;

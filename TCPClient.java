@@ -4,7 +4,8 @@ import java.net.Socket;
 
 public class TCPClient {
     private Node clientNode;
-    private ObjectOutputStream outToServer;
+    private Socket clientSocket;
+    private ObjectOutputStream outputStream;
     private Node serverNode;
 
     // public TCPClient() {
@@ -17,21 +18,26 @@ public class TCPClient {
 
     public void connect() {
         try {
-            Socket clientSocket = new Socket(this.serverNode.getHostName(), this.serverNode.getPort());
+            this.clientSocket = new Socket(this.serverNode.getHostName(), this.serverNode.getPort());
+            this.outputStream = new ObjectOutputStream(this.clientSocket.getOutputStream());
 
-            System.out.println("Client connected to UID: " + this.serverNode.getUID());
+            new Message(this.clientNode.getUID(), Message.MessageType.HANDSHAKE).send(this.outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-            this.outToServer = new ObjectOutputStream(clientSocket.getOutputStream());
-            this.outToServer.flush();
-
-            new Message(this.clientNode.getUID(), Message.MessageType.HANDSHAKE).send(this.outToServer);
+    public void closeConnection() {
+        try {
+            this.outputStream.close();
+            this.clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     // public ObjectOutputStream getOutputStream() {
-    // return this.outToServer;
+    // return this.outputStream;
     // }
 
     // public Node getServerNode() {

@@ -1,12 +1,10 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class TCPServer {
+public class TCPServer extends Thread {
     private Node serverNode;
-    private ServerSocket serverSocket;
 
     public TCPServer(Node serverNode) {
         this.serverNode = serverNode;
@@ -16,37 +14,32 @@ public class TCPServer {
     // return this.serverNode;
     // }
 
-    public void startListening() {
+    public void run() {
         try {
-            this.serverSocket = new ServerSocket(this.serverNode.getPort());
+            ServerSocket serverSocket = new ServerSocket(this.serverNode.getPort());
 
             System.out.println("Server online with UID: " + this.serverNode.getUID());
 
             while (true) {
                 Socket connectionSocket = serverSocket.accept();
+                ObjectInputStream ois = new ObjectInputStream(connectionSocket.getInputStream());
 
-                Runnable runnable = new Runnable() {
-                    public void run() {
-                        try {
-                            ObjectOutputStream outToClient = new ObjectOutputStream(connectionSocket.getOutputStream());
-                            outToClient.flush();
-                            ObjectInputStream inFromClient = new ObjectInputStream(connectionSocket.getInputStream());
+                try {
+                    while (true) {
+                        Message message = (Message) ois.readObject();
 
-                            while (true) {
-                                Message message = (Message) inFromClient.readObject();
-
-                                if (message.getType() != Message.MessageType.HANDSHAKE) {
-                                    serverNode.addReceivedMessage(message);
-                                }
-                            }
-                        } catch (IOException | ClassNotFoundException e) {
-                            e.printStackTrace();
+                        if (message.getType() != Message.MessageType.HANDSHAKE) {
+                            this.serverNode.addReceivedMessage(message);
+                        } else {
+                            System.out.println("Received HANDSHAKE from " + message.getSenderUID());
                         }
                     }
-                };
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
 
-                Thread t = new Thread(runnable);
-                t.start();
+                ois.close();
+                serverSocket.close();
             }
 
         } catch (IOException e) {

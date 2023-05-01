@@ -18,18 +18,18 @@ public class Message implements Serializable {
         this.type = type;
     }
 
-    // public int getSenderUID() {
-    // return this.senderUID;
-    // }
+    public int getSenderUID() {
+        return this.senderUID;
+    }
 
     public MessageType getType() {
         return this.type;
     }
 
-    public void send(ObjectOutputStream outToServer) {
+    public void send(ObjectOutputStream outputStream) {
         try {
-            outToServer.writeObject(this);
-            outToServer.flush();
+            outputStream.writeObject(this);
+            outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
