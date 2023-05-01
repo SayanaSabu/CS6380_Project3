@@ -65,6 +65,6 @@ public class LayeredBFS {
                 Message.MessageType.LAYERED_BFS_SEARCH,
                 this.currNode.getTreeDepth());
 
-        this.currNode.messageChildren(msg);
+        this.currNode.messageNeighbours(msg);
     }
 }

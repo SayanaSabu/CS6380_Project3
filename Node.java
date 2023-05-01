@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Node {
     private String hostName;
@@ -133,6 +134,12 @@ public class Node {
     public void messageChildren(Message msg) {
         for (Node child : this.childNodes) {
             new TCPClient(this, child).sendMessage(msg);
+        }
+    }
+
+    public void messageNeighbours(Message msg) {
+        for (Map.Entry<Integer, Node> n : this.neighbours.entrySet()) {
+            new TCPClient(this, n.getValue()).sendMessage(msg);
         }
     }
 
