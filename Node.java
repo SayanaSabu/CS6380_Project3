@@ -7,12 +7,10 @@ public class Node {
     private String hostName;
     private int leaderUID;
     private ArrayList<Node> neighbours = new ArrayList<Node>();
-    // private List<TCPClient> neighbourClients = Collections.synchronizedList(new
-    // ArrayList<TCPClient>());
+    private List<TCPClient> neighbourClients = Collections.synchronizedList(new ArrayList<TCPClient>());
     private int port;
     private int UID;
-    // private List<Message> receivedMessages = Collections.synchronizedList(new
-    // ArrayList<Message>());
+    private List<Message> receivedMessages = Collections.synchronizedList(new ArrayList<Message>());
 
     // // variables for building BFS tree
     // private List<Integer> childNodes = new ArrayList<Integer>();
@@ -36,21 +34,17 @@ public class Node {
         this.neighbours.add(neighbour);
     }
 
-    // public void addNeighbourClient(TCPClient client) {
-    // synchronized (this.neighbourClients) {
-    // this.neighbourClients.add(client);
-    // }
-    // }
+    public void addNeighbourClient(TCPClient client) {
+        synchronized (this.neighbourClients) {
+            this.neighbourClients.add(client);
+        }
+    }
 
-    // public void addReceivedMessage(Message msg) {
-    // synchronized (this.receivedMessages) {
-    // this.receivedMessages.add(msg);
-    // }
-    // }
-
-    // public boolean areAllNeighboursOnline() {
-    // return this.neighbours.size() == this.neighbourClients.size();
-    // }
+    public void addReceivedMessage(Message msg) {
+        synchronized (this.receivedMessages) {
+            this.receivedMessages.add(msg);
+        }
+    }
 
     // public void endLeaderElection(int leaderUID) {
     // this.leaderUID = leaderUID;
@@ -83,9 +77,9 @@ public class Node {
         return this.hostName;
     }
 
-    // public List<TCPClient> getNeighbourClients() {
-    // return this.neighbourClients;
-    // }
+    public List<TCPClient> getNeighbourClients() {
+        return this.neighbourClients;
+    }
 
     public ArrayList<Node> getNeighbourNodes() {
         return this.neighbours;
