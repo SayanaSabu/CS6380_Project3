@@ -10,10 +10,6 @@ public class TCPServer extends Thread {
         this.serverNode = serverNode;
     }
 
-    // public Node getServerNode() {
-    // return this.serverNode;
-    // }
-
     public void run() {
         try {
             ServerSocket serverSocket = new ServerSocket(this.serverNode.getPort());

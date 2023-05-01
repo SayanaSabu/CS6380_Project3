@@ -13,11 +13,8 @@ public class Main {
                 e.printStackTrace();
             }
 
-            for (Node neighbourNode : currNode.getNeighbourNodes()) {
-                TCPClient client = new TCPClient(currNode, neighbourNode);
-                client.connect();
-
-                currNode.addNeighbourClient(client);
+            for (Node neighbourNode : currNode.getNeighbours()) {
+                new TCPClient(currNode, neighbourNode).sendHandshake();
             }
 
             try {
@@ -26,10 +23,14 @@ public class Main {
                 e.printStackTrace();
             }
 
-            for (TCPClient client : currNode.getNeighbourClients()) {
-                client.closeConnection();
-            }
-            server.interrupt();
+            new LayeredBFS(currNode).buildTree();
+
+            /*
+             * for (TCPClient client : currNode.getNeighbourClients()) {
+             * client.closeConnection();
+             * }
+             * server.interrupt();
+             */
 
         } catch (Exception e) {
             e.printStackTrace();

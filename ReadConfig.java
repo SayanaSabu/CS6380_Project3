@@ -62,7 +62,7 @@ public class ReadConfig {
             int leaderUID = Integer.parseInt(thisLine);
 
             for (Map.Entry<Integer, Node> e : nodeMap.entrySet()) {
-                e.getValue().setLeaderUID(leaderUID);
+                e.getValue().setLeader(leaderUID);
             }
         } finally {
             br.close();

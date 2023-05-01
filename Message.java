@@ -1,20 +1,29 @@
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class Message implements Serializable {
     public enum MessageType {
-        HANDSHAKE
+        HANDSHAKE,
+        LAYERED_BFS_SEARCH,
+        LAYERED_BFS_SEARCH_ACK_ACCEPTED,
+        LAYERED_BFS_SEARCH_ACK_REJECTED
     }
 
     private int senderUID = -1;
     private MessageType type;
 
-    // public Message() {
-    // }
+    private int treeDepth = -1;
+
+    public Message() {
+    }
 
     public Message(int senderUID, MessageType type) {
         this.senderUID = senderUID;
+        this.type = type;
+    }
+
+    public Message(int senderUID, MessageType type, int treeDepth) {
+        this.senderUID = senderUID;
+        this.treeDepth = treeDepth;
         this.type = type;
     }
 
@@ -22,16 +31,11 @@ public class Message implements Serializable {
         return this.senderUID;
     }
 
-    public MessageType getType() {
-        return this.type;
+    public int getTreeDepth() {
+        return this.treeDepth;
     }
 
-    public void send(ObjectOutputStream outputStream) {
-        try {
-            outputStream.writeObject(this);
-            outputStream.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public MessageType getType() {
+        return this.type;
     }
 }
