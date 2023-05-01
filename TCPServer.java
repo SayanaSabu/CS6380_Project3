@@ -5,6 +5,7 @@ import java.net.Socket;
 
 public class TCPServer extends Thread {
     private Node serverNode;
+    private volatile boolean shouldStop = false;
 
     public TCPServer(Node serverNode) {
         this.serverNode = serverNode;
@@ -20,30 +21,32 @@ public class TCPServer extends Thread {
 
             System.out.println("Server online with UID: " + this.serverNode.getUID());
 
-            while (true) {
+            while (!this.shouldStop) {
                 Socket connectionSocket = serverSocket.accept();
                 ObjectInputStream ois = new ObjectInputStream(connectionSocket.getInputStream());
 
                 try {
-                    while (true) {
-                        Message message = (Message) ois.readObject();
+                    Message message = (Message) ois.readObject();
 
-                        if (message.getType() != Message.MessageType.HANDSHAKE) {
-                            this.serverNode.addReceivedMessage(message);
-                        } else {
-                            System.out.println("Received HANDSHAKE from " + message.getSenderUID());
-                        }
+                    if (message.getType() != Message.MessageType.HANDSHAKE) {
+                        this.serverNode.addReceivedMessage(message);
+                    } else {
+                        System.out.println("Received HANDSHAKE from " + message.getSenderUID());
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
 
                 ois.close();
-                serverSocket.close();
+                connectionSocket.close();
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void stopListening() {
+        this.shouldStop = true;
     }
 }
