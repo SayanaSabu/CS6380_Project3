@@ -15,6 +15,7 @@ public class Node {
 
     private ArrayList<Node> childNodes = new ArrayList<Node>();
     private int depth = 0;
+    private int maxDegree = -1;
     private int parentUID = -1;
     private int treeLevel = -1;
 
@@ -30,6 +31,8 @@ public class Node {
     public void addChildNode(int childUID) {
         Node childNode = this.neighbours.get(childUID);
         this.childNodes.add(childNode);
+
+        this.setMaxDegree(this.getDegree());
 
         String childrenStr = "";
         for (Node child : this.childNodes) {
@@ -146,6 +149,11 @@ public class Node {
         return this.receivedMessages.size() > 0
                 ? this.receivedMessages.remove(0)
                 : new Message();
+    }
+
+    public void setMaxDegree(int newDegree) {
+        this.maxDegree = Math.max(this.maxDegree, newDegree);
+        System.out.println("Updated max degree: " + this.maxDegree);
     }
 
     public void setLeader(int leaderUID) {

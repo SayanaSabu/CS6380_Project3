@@ -87,6 +87,7 @@ public class LayeredBFS {
 
                 this.currNode.messageParent(newMsg);
             } else {
+                this.currNode.setMaxDegree(this.phaseCompleteMaxDegree);
                 System.out.println("Layer complete");
             }
         }
