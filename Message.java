@@ -4,6 +4,7 @@ public class Message implements Serializable {
     public enum MessageType {
         HANDSHAKE,
         LAYERED_BFS_NEW_PHASE,
+        LAYERED_BFS_NEW_PHASE_COMPLETE,
         LAYERED_BFS_SEARCH,
         LAYERED_BFS_SEARCH_ACK_ACCEPTED,
         LAYERED_BFS_SEARCH_ACK_REJECTED
@@ -12,6 +13,7 @@ public class Message implements Serializable {
     private int senderUID = -1;
     private MessageType type;
 
+    private int degree = -1;
     private int treeDepth = -1;
 
     public Message() {
@@ -26,6 +28,17 @@ public class Message implements Serializable {
         this.senderUID = senderUID;
         this.treeDepth = treeDepth;
         this.type = type;
+    }
+
+    public Message(int senderUID, MessageType type, int treeDepth, int degree) {
+        this.degree = degree;
+        this.senderUID = senderUID;
+        this.treeDepth = treeDepth;
+        this.type = type;
+    }
+
+    public int getDegree() {
+        return this.degree;
     }
 
     public int getSenderUID() {

@@ -58,11 +58,11 @@ public class Node {
     // return this.childNodes;
     // }
 
-    // public int getDegree() {
-    // return this.isNodeLeader()
-    // ? this.childNodes.size()
-    // : this.childNodes.size() + 1;
-    // }
+    public int getDegree() {
+        return this.isNodeLeader()
+                ? this.childNodes.size()
+                : this.childNodes.size() + 1;
+    }
 
     public String getHostName() {
         return this.hostName;
