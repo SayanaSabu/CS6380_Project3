@@ -10,10 +10,6 @@ public class TCPServer extends Thread {
         this.serverNode = serverNode;
     }
 
-    // public Node getServerNode() {
-    // return this.serverNode;
-    // }
-
     public void run() {
         try {
             ServerSocket serverSocket = new ServerSocket(this.serverNode.getPort());
@@ -29,8 +25,6 @@ public class TCPServer extends Thread {
 
                     if (message.getType() != Message.MessageType.HANDSHAKE) {
                         this.serverNode.addReceivedMessage(message);
-                    } else {
-                        System.out.println("Received HANDSHAKE from " + message.getSenderUID());
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();

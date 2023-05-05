@@ -13,23 +13,40 @@ public class Main {
                 e.printStackTrace();
             }
 
-            for (Node neighbourNode : currNode.getNeighbourNodes()) {
-                TCPClient client = new TCPClient(currNode, neighbourNode);
-                client.connect();
-
-                currNode.addNeighbourClient(client);
+            for (Node neighbourNode : currNode.getNeighbours()) {
+                new TCPClient(currNode, neighbourNode).sendHandshake();
             }
 
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            while (true) {
+                long handshakeMessagesCount = currNode
+                        .getReceivedMessages()
+                        .stream()
+                        .filter(msg -> msg.getType() == Message.MessageType.HANDSHAKE)
+                        .count();
+                int neighboursCount = currNode.getNeighbours().size();
+
+                boolean didAllNeighboursReply = neighboursCount == (int) handshakeMessagesCount;
+
+                if (!didAllNeighboursReply) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    System.out.println("Handshake received from all neighbours");
+                    break;
+                }
             }
 
-            for (TCPClient client : currNode.getNeighbourClients()) {
-                client.closeConnection();
-            }
-            server.interrupt();
+            new LayeredBFS(currNode).buildTree();
+
+            /*
+             * for (TCPClient client : currNode.getNeighbourClients()) {
+             * client.closeConnection();
+             * }
+             * server.interrupt();
+             */
 
         } catch (Exception e) {
             e.printStackTrace();
