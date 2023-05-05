@@ -92,7 +92,7 @@ public class LayeredBFS {
     private void handleSearchMessage(Message msg) {
         Message.MessageType type = Message.MessageType.LAYERED_BFS_SEARCH_ACK_REJECTED;
 
-        if (this.currNode.getParentUID() == -1) {
+        if (this.currNode.getParentUID() == -1 && !this.currNode.isNodeLeader()) {
             this.currNode.setParent(msg.getSenderUID(), msg.getTreeDepth());
             type = Message.MessageType.LAYERED_BFS_SEARCH_ACK_ACCEPTED;
         }

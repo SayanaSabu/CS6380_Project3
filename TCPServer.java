@@ -22,10 +22,7 @@ public class TCPServer extends Thread {
 
                 try {
                     Message message = (Message) ois.readObject();
-
-                    if (message.getType() != Message.MessageType.HANDSHAKE) {
-                        this.serverNode.addReceivedMessage(message);
-                    }
+                    this.serverNode.addReceivedMessage(message);
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
