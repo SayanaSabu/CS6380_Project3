@@ -15,7 +15,7 @@ public class LayeredBFS {
                     Message.MessageType.LAYERED_BFS_SEARCH,
                     this.currNode.getTreeDepth());
 
-            this.currNode.messageNeighbours(msg);
+            this.currNode.messageAllNeighbours(msg);
         }
 
         while (true) {
@@ -64,14 +64,14 @@ public class LayeredBFS {
                     Message.MessageType.LAYERED_BFS_SEARCH,
                     msg.getTreeDepth());
 
-            this.currNode.messageNeighbours(newMsg);
+            this.currNode.messageAllNeighbours(newMsg);
         } else {
             Message newMsg = new Message(
                     this.currNode.getUID(),
                     Message.MessageType.LAYERED_BFS_NEW_PHASE,
                     msg.getTreeDepth());
 
-            this.currNode.messageChildren(newMsg);
+            this.currNode.messageAllChildren(newMsg);
         }
     }
 
@@ -92,7 +92,7 @@ public class LayeredBFS {
                         Message.MessageType.LAYERED_BFS_NEW_PHASE,
                         this.currNode.getTreeDepth());
 
-                this.currNode.messageChildren(newMsg);
+                this.currNode.messageAllChildren(newMsg);
             } else {
                 System.out.println("All neighbours ack");
             }
@@ -108,6 +108,6 @@ public class LayeredBFS {
         }
 
         Message reply = new Message(this.currNode.getUID(), type);
-        this.currNode.messageParent(reply);
+        this.currNode.messageNeighbour(reply, msg.getSenderUID());
     }
 }

@@ -115,16 +115,21 @@ public class Node {
     // return false;
     // }
 
-    public void messageChildren(Message msg) {
+    public void messageAllChildren(Message msg) {
         for (Node child : this.childNodes) {
             new TCPClient(this, child).sendMessage(msg);
         }
     }
 
-    public void messageNeighbours(Message msg) {
+    public void messageAllNeighbours(Message msg) {
         for (Map.Entry<Integer, Node> n : this.neighbours.entrySet()) {
             new TCPClient(this, n.getValue()).sendMessage(msg);
         }
+    }
+
+    public void messageNeighbour(Message msg, int neighbourUID) {
+        Node neighbourNode = this.neighbours.get(neighbourUID);
+        new TCPClient(this, neighbourNode).sendMessage(msg);
     }
 
     public void messageParent(Message msg) {
