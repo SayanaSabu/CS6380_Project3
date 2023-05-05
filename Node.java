@@ -31,16 +31,17 @@ public class Node {
         Node childNode = this.neighbours.get(childUID);
         this.childNodes.add(childNode);
 
-        System.out.println("Child node for " + this.UID + " is " + childUID);
+        String childrenStr = "";
+        for (Node child : this.childNodes) {
+            childrenStr += child.getUID() + " ";
+        }
+
+        System.out.println("Updated children: " + childrenStr);
     }
 
     public void addNeighbour(Node neighbour) {
         this.neighbours.put(neighbour.getUID(), neighbour);
     }
-
-    // public void addNeighbourClient(TCPClient client) {
-    // this.neighbourClients.put(client.getServerNode().getUID(), client);
-    // }
 
     public void addReceivedMessage(Message msg) {
         synchronized (this.receivedMessages) {
@@ -53,20 +54,8 @@ public class Node {
     // this.receivedMessages.clear();
     // }
 
-    // public ArrayList<Node> getAllNodes() {
-    // return this.allNodes;
-    // }
-
     // public List<Integer> getChildNodes() {
     // return this.childNodes;
-    // }
-
-    // public TCPClient getClientConnection(int clientUID) {
-    // for (TCPClient client : this.neighbourClients) {
-    // if (clientUID == client.getServerNode().getUID())
-    // return client;
-    // }
-    // return new TCPClient();
     // }
 
     // public int getDegree() {
@@ -78,10 +67,6 @@ public class Node {
     public String getHostName() {
         return this.hostName;
     }
-
-    // public List<TCPClient> getNeighbourClients() {
-    // return this.neighbourClients;
-    // }
 
     public ArrayList<Node> getNeighbours() {
         return new ArrayList<>(this.neighbours.values());
@@ -103,8 +88,16 @@ public class Node {
         return this.depth;
     }
 
+    public int getTreeLevel() {
+        return this.treeLevel;
+    }
+
     public int getUID() {
         return this.UID;
+    }
+
+    public void increaseTreeDepth() {
+        this.depth += 1;
     }
 
     // public boolean isNodeChild(int nodeUID) {
@@ -127,20 +120,21 @@ public class Node {
     // return false;
     // }
 
-    // public boolean isNodeVisited() {
-    // return this.visited;
-    // }
-
-    public void messageChildren(Message msg) {
+    public void messageAllChildren(Message msg) {
         for (Node child : this.childNodes) {
             new TCPClient(this, child).sendMessage(msg);
         }
     }
 
-    public void messageNeighbours(Message msg) {
+    public void messageAllNeighbours(Message msg) {
         for (Map.Entry<Integer, Node> n : this.neighbours.entrySet()) {
             new TCPClient(this, n.getValue()).sendMessage(msg);
         }
+    }
+
+    public void messageNeighbour(Message msg, int neighbourUID) {
+        Node neighbourNode = this.neighbours.get(neighbourUID);
+        new TCPClient(this, neighbourNode).sendMessage(msg);
     }
 
     public void messageParent(Message msg) {
@@ -154,10 +148,6 @@ public class Node {
                 : new Message();
     }
 
-    // public void setAllNodes(ArrayList<Node> allNodes) {
-    // this.allNodes = allNodes;
-    // }
-
     public void setLeader(int leaderUID) {
         this.leaderUID = leaderUID;
     }
@@ -166,26 +156,6 @@ public class Node {
         this.parentUID = parentUID;
         this.treeLevel = rootTreeDepth + 1;
 
-        System.out.println("Parent node for " + this.UID + " is " + parentUID);
+        System.out.println("Updated parent: " + this.parentUID + "\nTree level: " + this.treeLevel);
     }
-
-    // public void setVisited(boolean visited) {
-    // this.visited = visited;
-    // }
-
-    // public void startBFSBuild() {
-    // this.childNodes.clear();
-    // this.parentUID = -1;
-    // this.visited = false;
-    // }
-
-    public void startLayeredBFS() {
-        this.childNodes.clear();
-        this.depth = 0;
-        this.parentUID = -1;
-    }
-
-    // public void startLeaderElection() {
-    // this.leaderUID = -1;
-    // }
 }

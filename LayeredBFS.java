@@ -7,15 +7,29 @@ public class LayeredBFS {
     }
 
     public void buildTree() {
-        System.out.println("LayeredBFS build tree started");
+        System.out.println("LayeredBFS started");
 
         if (this.currNode.isNodeLeader()) {
-            this.currNode.startLayeredBFS();
-            this.sendSearch();
+            Message msg = new Message(
+                    this.currNode.getUID(),
+                    Message.MessageType.LAYERED_BFS_SEARCH,
+                    this.currNode.getTreeDepth());
+
+            this.currNode.messageAllNeighbours(msg);
         }
 
         while (true) {
             this.handleIncomingMessages();
+        }
+    }
+
+    private boolean didAllNeighboursReplyAck() {
+        int neighboursCount = this.currNode.getNeighbours().size();
+
+        if (this.currNode.isNodeLeader()) {
+            return searchAckNeighboursCount == neighboursCount;
+        } else {
+            return searchAckNeighboursCount + 1 == neighboursCount;
         }
     }
 
@@ -34,8 +48,30 @@ public class LayeredBFS {
                 this.handleSearchAckMessage(currMessage);
                 break;
 
+            case LAYERED_BFS_NEW_PHASE:
+                this.handleNewPhaseMessage(currMessage);
+                break;
+
             default:
-                return;
+                this.currNode.addReceivedMessage(currMessage);
+        }
+    }
+
+    private void handleNewPhaseMessage(Message msg) {
+        if (msg.getTreeDepth() == this.currNode.getTreeLevel()) {
+            Message newMsg = new Message(
+                    this.currNode.getUID(),
+                    Message.MessageType.LAYERED_BFS_SEARCH,
+                    msg.getTreeDepth());
+
+            this.currNode.messageAllNeighbours(newMsg);
+        } else {
+            Message newMsg = new Message(
+                    this.currNode.getUID(),
+                    Message.MessageType.LAYERED_BFS_NEW_PHASE,
+                    msg.getTreeDepth());
+
+            this.currNode.messageAllChildren(newMsg);
         }
     }
 
@@ -45,26 +81,35 @@ public class LayeredBFS {
         if (msg.getType() == Message.MessageType.LAYERED_BFS_SEARCH_ACK_ACCEPTED) {
             this.currNode.addChildNode(msg.getSenderUID());
         }
+
+        if (this.didAllNeighboursReplyAck()) {
+            if (this.currNode.isNodeLeader()) {
+                this.currNode.increaseTreeDepth();
+
+                System.out.println("Layer 1 complete");
+                System.out.println("Layer 2 started");
+
+                Message newMsg = new Message(
+                        this.currNode.getUID(),
+                        Message.MessageType.LAYERED_BFS_NEW_PHASE,
+                        this.currNode.getTreeDepth());
+
+                this.currNode.messageAllChildren(newMsg);
+            } else {
+                System.out.println("All neighbours ack");
+            }
+        }
     }
 
     private void handleSearchMessage(Message msg) {
         Message.MessageType type = Message.MessageType.LAYERED_BFS_SEARCH_ACK_REJECTED;
 
-        if (this.currNode.getParentUID() == -1) {
+        if (this.currNode.getParentUID() == -1 && !this.currNode.isNodeLeader()) {
             this.currNode.setParent(msg.getSenderUID(), msg.getTreeDepth());
             type = Message.MessageType.LAYERED_BFS_SEARCH_ACK_ACCEPTED;
         }
 
         Message reply = new Message(this.currNode.getUID(), type);
-        this.currNode.messageParent(reply);
-    }
-
-    private void sendSearch() {
-        Message msg = new Message(
-                this.currNode.getUID(),
-                Message.MessageType.LAYERED_BFS_SEARCH,
-                this.currNode.getTreeDepth());
-
-        this.currNode.messageNeighbours(msg);
+        this.currNode.messageNeighbour(reply, msg.getSenderUID());
     }
 }

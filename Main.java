@@ -34,7 +34,7 @@ public class Main {
                         e.printStackTrace();
                     }
                 } else {
-                    System.out.println("Handshake received from all neighbours");
+                    // System.out.println("Handshake received from all neighbours");
                     break;
                 }
             }

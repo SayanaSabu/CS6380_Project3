@@ -1,0 +1,15 @@
+
+
+1. LAYERED_BFS_SEARCH
+    - Depth = current depth of tree
+2. LAYERED_BFS_SEARCH_ACK_ACCEPTED
+    - 
+3. LAYERED_BFS_SEARCH_ACK_REJECTED
+    - 
+4. LAYERED_BFS_NEW_PHASE
+    - Depth = current depth of tree
+5. LAYERED_BFS_NEW_PHASE_COMPLETE
+    - Nodes count = Number of children
+    - Tree level
+6. LAYERED_BFS_COMPLETE
+    - Max degree
