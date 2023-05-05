@@ -13,8 +13,10 @@ public class Message implements Serializable {
     private int senderUID = -1;
     private MessageType type;
 
-    private int degree = -1;
+    private boolean childrenFound = false;
+    private int maxDegree = -1;
     private int treeDepth = -1;
+    private int treeLevel = -1;
 
     public Message() {
     }
@@ -30,15 +32,20 @@ public class Message implements Serializable {
         this.type = type;
     }
 
-    public Message(int senderUID, MessageType type, int treeDepth, int degree) {
-        this.degree = degree;
+    public Message(int senderUID, MessageType type, int treeLevel, int maxDegree, boolean childrenFound) {
+        this.childrenFound = childrenFound;
+        this.maxDegree = maxDegree;
         this.senderUID = senderUID;
-        this.treeDepth = treeDepth;
+        this.treeLevel = treeLevel;
         this.type = type;
     }
 
-    public int getDegree() {
-        return this.degree;
+    public boolean getChildrenFound() {
+        return this.childrenFound;
+    }
+
+    public int getMaxDegree() {
+        return this.maxDegree;
     }
 
     public int getSenderUID() {

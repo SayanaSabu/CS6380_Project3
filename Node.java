@@ -11,12 +11,15 @@ public class Node {
     private List<Message> receivedMessages = Collections.synchronizedList(new ArrayList<Message>());
     private int UID;
 
-    private int leaderUID;
-
     private ArrayList<Node> childNodes = new ArrayList<Node>();
+    private int leaderUID;
+    private int parentUID = -1;
+
+    // Used only by leader
     private int depth = 0;
     private int maxDegree = -1;
-    private int parentUID = -1;
+
+    // Used only by non-leader nodes
     private int treeLevel = -1;
 
     public Node() {
@@ -60,6 +63,10 @@ public class Node {
     // public List<Integer> getChildNodes() {
     // return this.childNodes;
     // }
+
+    public int getChildrenCount() {
+        return this.childNodes.size();
+    }
 
     public int getDegree() {
         return this.isNodeLeader()
