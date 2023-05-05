@@ -10,7 +10,12 @@ public class LayeredBFS {
         System.out.println("LayeredBFS build tree started");
 
         if (this.currNode.isNodeLeader()) {
-            this.sendSearchMessage();
+            Message msg = new Message(
+                    this.currNode.getUID(),
+                    Message.MessageType.LAYERED_BFS_SEARCH,
+                    this.currNode.getTreeDepth());
+
+            this.currNode.messageNeighbours(msg);
         }
 
         while (true) {
@@ -54,7 +59,12 @@ public class LayeredBFS {
 
     private void handleNewPhaseMessage(Message msg) {
         if (msg.getTreeDepth() == this.currNode.getTreeLevel()) {
-            this.sendSearchMessage();
+            Message newMsg = new Message(
+                    this.currNode.getUID(),
+                    Message.MessageType.LAYERED_BFS_SEARCH,
+                    msg.getTreeDepth());
+
+            this.currNode.messageNeighbours(newMsg);
         } else {
             Message newMsg = new Message(
                     this.currNode.getUID(),
@@ -99,14 +109,5 @@ public class LayeredBFS {
 
         Message reply = new Message(this.currNode.getUID(), type);
         this.currNode.messageParent(reply);
-    }
-
-    private void sendSearchMessage() {
-        Message msg = new Message(
-                this.currNode.getUID(),
-                Message.MessageType.LAYERED_BFS_SEARCH,
-                this.currNode.getTreeDepth());
-
-        this.currNode.messageNeighbours(msg);
     }
 }
