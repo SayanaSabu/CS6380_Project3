@@ -13,8 +13,7 @@ public class TCPServer extends Thread {
     public void run() {
         try {
             ServerSocket serverSocket = new ServerSocket(this.serverNode.getPort());
-
-            System.out.println("Server online with UID: " + this.serverNode.getUID());
+            System.out.println("Server online");
 
             while (!Thread.currentThread().isInterrupted()) {
                 Socket connectionSocket = serverSocket.accept();

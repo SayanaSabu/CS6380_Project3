@@ -7,7 +7,7 @@ public class LayeredBFS {
     }
 
     public void buildTree() {
-        System.out.println("LayeredBFS build tree started");
+        System.out.println("LayeredBFS started");
 
         if (this.currNode.isNodeLeader()) {
             Message msg = new Message(
@@ -84,8 +84,10 @@ public class LayeredBFS {
 
         if (this.didAllNeighboursReplyAck()) {
             if (this.currNode.isNodeLeader()) {
-                System.out.println("Layer 1 complete.");
                 this.currNode.increaseTreeDepth();
+
+                System.out.println("Layer 1 complete");
+                System.out.println("Layer 2 started");
 
                 Message newMsg = new Message(
                         this.currNode.getUID(),

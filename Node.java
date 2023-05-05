@@ -31,7 +31,12 @@ public class Node {
         Node childNode = this.neighbours.get(childUID);
         this.childNodes.add(childNode);
 
-        System.out.println("Child node for " + this.UID + " is " + childUID);
+        String childrenStr = "";
+        for (Node child : this.childNodes) {
+            childrenStr += child.getUID() + " ";
+        }
+
+        System.out.println("Updated children: " + childrenStr);
     }
 
     public void addNeighbour(Node neighbour) {
@@ -151,6 +156,6 @@ public class Node {
         this.parentUID = parentUID;
         this.treeLevel = rootTreeDepth + 1;
 
-        System.out.println("Parent node = " + this.parentUID + ". Tree level = " + this.treeLevel);
+        System.out.println("Updated parent: " + this.parentUID + "\nTree level: " + this.treeLevel);
     }
 }
