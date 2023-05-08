@@ -3,7 +3,7 @@ public class LayeredBFS {
 
     private boolean childrenFound = false;
     private int maxDegree = -1;
-    private int phaseCompleteNeighboursCount = 0;
+    private int phaseCompleteChildrenCount = 0;
     private int searchAcceptNeighboursCount = 0;
     private int searchAckNeighboursCount = 0;
 
@@ -39,13 +39,8 @@ public class LayeredBFS {
     }
 
     private boolean didAllNeighboursPhaseComplete() {
-        int neighboursCount = this.currNode.getNeighbours().size();
-
-        if (this.currNode.isNodeLeader()) {
-            return this.phaseCompleteNeighboursCount == neighboursCount;
-        } else {
-            return this.phaseCompleteNeighboursCount + 1 == neighboursCount;
-        }
+        int childrenCount = this.currNode.getChildrenCount();
+        return this.phaseCompleteChildrenCount == childrenCount;
     }
 
     private void handleIncomingMessages() {
@@ -79,8 +74,7 @@ public class LayeredBFS {
     }
 
     private void handleNewPhaseCompleteMessage(Message msg) {
-        System.out.println(msg.getChildrenFound());
-        this.phaseCompleteNeighboursCount += 1;
+        this.phaseCompleteChildrenCount += 1;
 
         this.childrenFound = this.childrenFound || msg.getChildrenFound();
         this.maxDegree = Math.max(this.maxDegree, msg.getMaxDegree());
@@ -106,7 +100,7 @@ public class LayeredBFS {
 
                 this.childrenFound = false;
                 this.maxDegree = -1;
-                this.phaseCompleteNeighboursCount = 0;
+                this.phaseCompleteChildrenCount = 0;
                 this.searchAcceptNeighboursCount = 0;
                 this.searchAckNeighboursCount = 0;
 
@@ -120,7 +114,7 @@ public class LayeredBFS {
     private void handleNewPhaseMessage(Message msg) {
         this.childrenFound = false;
         this.maxDegree = -1;
-        this.phaseCompleteNeighboursCount = 0;
+        this.phaseCompleteChildrenCount = 0;
         this.searchAcceptNeighboursCount = 0;
         this.searchAckNeighboursCount = 0;
 
