@@ -52,6 +52,8 @@ public class LayeredBFS {
         if (currMessage.getSenderUID() == -1)
             return;
 
+        System.out.println("Received " + currMessage.getType() + " from " + currMessage.getSenderUID());
+
         switch (currMessage.getType()) {
             case LAYERED_BFS_SEARCH:
                 this.handleSearchMessage(currMessage);
@@ -71,11 +73,12 @@ public class LayeredBFS {
                 break;
 
             default:
-                this.currNode.addReceivedMessage(currMessage);
+                return;
         }
     }
 
     private void handleNewPhaseCompleteMessage(Message msg) {
+        System.out.println(msg.getChildrenFound());
         this.phaseCompleteNeighboursCount += 1;
 
         this.childrenFound = this.childrenFound || msg.getChildrenFound();
@@ -94,8 +97,6 @@ public class LayeredBFS {
             } else if (this.childrenFound) {
                 this.currNode.increaseTreeDepth();
                 this.currNode.setMaxDegree(this.maxDegree);
-
-                System.out.println("Layer " + this.currNode.getTreeDepth() + " complete");
 
                 Message newMsg = new Message(
                         this.currNode.getUID(),
@@ -120,10 +121,7 @@ public class LayeredBFS {
         this.phaseCompleteNeighboursCount = 0;
         this.searchAckNeighboursCount = 0;
 
-        System.out.println("Received new phase. Tree depth: " + msg.getTreeDepth());
-
         if (msg.getTreeDepth() == this.currNode.getTreeLevel()) {
-            System.out.println("Sending search");
             Message newMsg = new Message(
                     this.currNode.getUID(),
                     Message.MessageType.LAYERED_BFS_SEARCH,
@@ -159,7 +157,6 @@ public class LayeredBFS {
                         Message.MessageType.LAYERED_BFS_NEW_PHASE,
                         this.currNode.getTreeDepth());
 
-                System.out.println("Sending new phase. Tree depth: " + this.currNode.getTreeDepth());
                 this.currNode.messageAllChildren(newMsg);
             } else {
                 Message newMsg = new Message(

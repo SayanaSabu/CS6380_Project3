@@ -11,7 +11,7 @@ public class Node {
     private List<Message> receivedMessages = Collections.synchronizedList(new ArrayList<Message>());
     private int UID;
 
-    private ArrayList<Node> childNodes = new ArrayList<Node>();
+    private List<Node> childNodes = Collections.synchronizedList(new ArrayList<Node>());
     private int leaderUID;
     private int parentUID = -1;
 
@@ -32,10 +32,12 @@ public class Node {
     }
 
     public void addChildNode(int childUID) {
-        Node childNode = this.neighbours.get(childUID);
-        this.childNodes.add(childNode);
+        synchronized (this.childNodes) {
+            Node childNode = this.neighbours.get(childUID);
+            this.childNodes.add(childNode);
 
-        this.setMaxDegree(this.getDegree());
+            this.setMaxDegree(this.getDegree());
+        }
 
         // String childrenStr = "";
         // for (Node child : this.childNodes) {
@@ -65,13 +67,15 @@ public class Node {
     // }
 
     public int getChildrenCount() {
-        return this.childNodes.size();
+        synchronized (this.childNodes) {
+            return this.childNodes.size();
+        }
     }
 
     public int getDegree() {
         return this.isNodeLeader()
-                ? this.childNodes.size()
-                : this.childNodes.size() + 1;
+                ? this.getChildrenCount()
+                : this.getChildrenCount() + 1;
     }
 
     public String getHostName() {
@@ -131,8 +135,10 @@ public class Node {
     // }
 
     public void messageAllChildren(Message msg) {
-        for (Node child : this.childNodes) {
-            new TCPClient(this, child).sendMessage(msg);
+        synchronized (this.childNodes) {
+            for (Node child : this.childNodes) {
+                new TCPClient(this, child).sendMessage(msg);
+            }
         }
     }
 
@@ -153,9 +159,11 @@ public class Node {
     }
 
     public Message popLatestReceivedMessage() {
-        return this.receivedMessages.size() > 0
-                ? this.receivedMessages.remove(0)
-                : new Message();
+        synchronized (this.receivedMessages) {
+            return this.receivedMessages.size() > 0
+                    ? this.receivedMessages.remove(0)
+                    : new Message();
+        }
     }
 
     public void setMaxDegree(int newDegree) {
