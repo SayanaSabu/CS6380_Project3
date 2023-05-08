@@ -95,6 +95,8 @@ public class LayeredBFS {
                 this.currNode.increaseTreeDepth();
                 this.currNode.setMaxDegree(this.maxDegree);
 
+                System.out.println("Layer " + this.currNode.getTreeDepth() + " complete");
+
                 Message newMsg = new Message(
                         this.currNode.getUID(),
                         Message.MessageType.LAYERED_BFS_NEW_PHASE,

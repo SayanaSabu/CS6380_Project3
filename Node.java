@@ -160,7 +160,6 @@ public class Node {
 
     public void setMaxDegree(int newDegree) {
         this.maxDegree = Math.max(this.maxDegree, newDegree);
-        System.out.println("Updated max degree: " + this.maxDegree);
     }
 
     public void setLeader(int leaderUID) {
