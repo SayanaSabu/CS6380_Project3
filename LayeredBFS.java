@@ -28,19 +28,14 @@ public class LayeredBFS {
         }
     }
 
-    private boolean didAllNeighboursAck() {
-        int neighboursCount = this.currNode.getNeighbours().size();
-
-        if (this.currNode.isNodeLeader()) {
-            return this.searchAckNeighboursCount == neighboursCount;
-        } else {
-            return this.searchAckNeighboursCount + 1 == neighboursCount;
-        }
-    }
-
-    private boolean didAllNeighboursPhaseComplete() {
+    private boolean didAllChildrenPhaseComplete() {
         int childrenCount = this.currNode.getChildrenCount();
         return this.phaseCompleteChildrenCount == childrenCount;
+    }
+
+    private boolean didAllNeighboursAck() {
+        int neighboursCount = this.currNode.getNeighbours().size();
+        return this.searchAckNeighboursCount == neighboursCount;
     }
 
     private void handleIncomingMessages() {
@@ -48,8 +43,7 @@ public class LayeredBFS {
         if (currMessage.getSenderUID() == -1)
             return;
 
-        // System.out.println("Received " + currMessage.getType() + " from " +
-        // currMessage.getSenderUID());
+        System.out.println("Received " + currMessage.getType() + " from " + currMessage.getSenderUID());
 
         switch (currMessage.getType()) {
             case LAYERED_BFS_SEARCH:
@@ -77,10 +71,10 @@ public class LayeredBFS {
     private void handleNewPhaseCompleteMessage(Message msg) {
         this.phaseCompleteChildrenCount += 1;
 
-        this.childrenFound = this.childrenFound || msg.getChildrenFound();
+        this.childrenFound = (this.childrenFound || msg.getChildrenFound());
         this.maxDegree = Math.max(this.maxDegree, msg.getMaxDegree());
 
-        if (this.didAllNeighboursPhaseComplete()) {
+        if (this.didAllChildrenPhaseComplete()) {
             if (!this.currNode.isNodeLeader()) {
                 Message newMsg = new Message(
                         this.currNode.getUID(),
@@ -128,13 +122,22 @@ public class LayeredBFS {
                     msg.getTreeDepth());
 
             this.currNode.messageAllNeighbours(newMsg);
-        } else {
+        } else if (this.currNode.getChildrenCount() > 0) {
             Message newMsg = new Message(
                     this.currNode.getUID(),
                     Message.MessageType.LAYERED_BFS_NEW_PHASE,
                     msg.getTreeDepth());
 
             this.currNode.messageAllChildren(newMsg);
+        } else {
+            Message newMsg = new Message(
+                    this.currNode.getUID(),
+                    Message.MessageType.LAYERED_BFS_NEW_PHASE_COMPLETE,
+                    this.currNode.getTreeLevel(),
+                    this.currNode.getDegree(),
+                    false);
+
+            this.currNode.messageParent(newMsg);
         }
     }
 
