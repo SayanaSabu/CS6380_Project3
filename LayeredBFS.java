@@ -120,7 +120,10 @@ public class LayeredBFS {
         this.phaseCompleteNeighboursCount = 0;
         this.searchAckNeighboursCount = 0;
 
+        System.out.println("Received new phase. Tree depth: " + msg.getTreeDepth());
+
         if (msg.getTreeDepth() == this.currNode.getTreeLevel()) {
+            System.out.println("Sending search");
             Message newMsg = new Message(
                     this.currNode.getUID(),
                     Message.MessageType.LAYERED_BFS_SEARCH,
@@ -156,6 +159,7 @@ public class LayeredBFS {
                         Message.MessageType.LAYERED_BFS_NEW_PHASE,
                         this.currNode.getTreeDepth());
 
+                System.out.println("Sending new phase. Tree depth: " + this.currNode.getTreeDepth());
                 this.currNode.messageAllChildren(newMsg);
             } else {
                 Message newMsg = new Message(

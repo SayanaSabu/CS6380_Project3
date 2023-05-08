@@ -37,12 +37,12 @@ public class Node {
 
         this.setMaxDegree(this.getDegree());
 
-        String childrenStr = "";
-        for (Node child : this.childNodes) {
-            childrenStr += child.getUID() + " ";
-        }
+        // String childrenStr = "";
+        // for (Node child : this.childNodes) {
+        // childrenStr += child.getUID() + " ";
+        // }
 
-        System.out.println("Updated children: " + childrenStr);
+        // System.out.println("Updated children: " + childrenStr);
     }
 
     public void addNeighbour(Node neighbour) {
