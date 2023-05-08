@@ -20,7 +20,7 @@ public class Node {
     private int maxDegree = -1;
 
     // Used only by non-leader nodes
-    private int treeLevel = -1;
+    private int treeLevel = 0;
 
     public Node() {
     }
@@ -39,12 +39,7 @@ public class Node {
             this.setMaxDegree(this.getDegree());
         }
 
-        // String childrenStr = "";
-        // for (Node child : this.childNodes) {
-        // childrenStr += child.getUID() + " ";
-        // }
-
-        // System.out.println("Updated children: " + childrenStr);
+        System.out.println("Updated children: " + this.getChildrenStr());
     }
 
     public void addNeighbour(Node neighbour) {
@@ -72,6 +67,15 @@ public class Node {
         }
     }
 
+    public String getChildrenStr() {
+        String childrenStr = "";
+        for (Node child : this.childNodes) {
+            childrenStr += child.getUID() + " ";
+        }
+
+        return childrenStr;
+    }
+
     public int getDegree() {
         return this.isNodeLeader()
                 ? this.getChildrenCount()
@@ -80,6 +84,10 @@ public class Node {
 
     public String getHostName() {
         return this.hostName;
+    }
+
+    public int getMaxDegree() {
+        return this.maxDegree;
     }
 
     public ArrayList<Node> getNeighbours() {

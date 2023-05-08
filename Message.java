@@ -3,6 +3,7 @@ import java.io.Serializable;
 public class Message implements Serializable {
     public enum MessageType {
         HANDSHAKE,
+        LAYERED_BFS_COMPLETE,
         LAYERED_BFS_NEW_PHASE,
         LAYERED_BFS_NEW_PHASE_COMPLETE,
         LAYERED_BFS_SEARCH,

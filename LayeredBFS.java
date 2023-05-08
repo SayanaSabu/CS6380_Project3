@@ -1,6 +1,7 @@
 public class LayeredBFS {
     private Node currNode;
 
+    private boolean bfsComplete = false;
     private boolean childrenFound = false;
     private int maxDegree = -1;
     private int phaseCompleteChildrenCount = 0;
@@ -23,7 +24,7 @@ public class LayeredBFS {
             this.currNode.messageAllNeighbours(msg);
         }
 
-        while (true) {
+        while (!this.bfsComplete) {
             this.handleIncomingMessages();
         }
     }
@@ -43,7 +44,8 @@ public class LayeredBFS {
         if (currMessage.getSenderUID() == -1)
             return;
 
-        System.out.println("Received " + currMessage.getType() + " from " + currMessage.getSenderUID());
+        // System.out.println("Received " + currMessage.getType() + " from " +
+        // currMessage.getSenderUID());
 
         switch (currMessage.getType()) {
             case LAYERED_BFS_SEARCH:
@@ -63,9 +65,28 @@ public class LayeredBFS {
                 this.handleNewPhaseCompleteMessage(currMessage);
                 break;
 
+            case LAYERED_BFS_COMPLETE:
+                this.handleBFSCompleteMessage(currMessage);
+                break;
+
             default:
                 return;
         }
+    }
+
+    private void handleBFSCompleteMessage(Message msg) {
+        System.out.println("\nFinal connections"
+                + "\nParent: " + this.currNode.getParentUID()
+                + "\nChildren: " + this.currNode.getChildrenStr()
+                + "\nDegree: " + this.currNode.getDegree()
+                + "\nTree Level: " + this.currNode.getTreeLevel());
+
+        if (this.currNode.getChildrenCount() > 0) {
+            Message newMsg = new Message(this.currNode.getUID(), Message.MessageType.LAYERED_BFS_COMPLETE);
+            this.currNode.messageAllChildren(newMsg);
+        }
+
+        this.bfsComplete = true;
     }
 
     private void handleNewPhaseCompleteMessage(Message msg) {
@@ -104,6 +125,18 @@ public class LayeredBFS {
                 this.currNode.messageAllChildren(newMsg);
             } else {
                 System.out.println("BFS complete");
+
+                System.out.println("\nFinal connections"
+                        + "\nParent: " + this.currNode.getParentUID()
+                        + "\nChildren: " + this.currNode.getChildrenStr()
+                        + "\nDegree: " + this.currNode.getDegree()
+                        + "\nTree Level: " + this.currNode.getTreeLevel()
+                        + "\nMax Degree: " + this.currNode.getMaxDegree());
+
+                Message newMsg = new Message(this.currNode.getUID(), Message.MessageType.LAYERED_BFS_COMPLETE);
+                this.currNode.messageAllChildren(newMsg);
+
+                this.bfsComplete = true;
             }
         }
     }
