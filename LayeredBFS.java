@@ -48,7 +48,8 @@ public class LayeredBFS {
         if (currMessage.getSenderUID() == -1)
             return;
 
-        System.out.println("Received " + currMessage.getType() + " from " + currMessage.getSenderUID());
+        // System.out.println("Received " + currMessage.getType() + " from " +
+        // currMessage.getSenderUID());
 
         switch (currMessage.getType()) {
             case LAYERED_BFS_SEARCH:
@@ -97,6 +98,8 @@ public class LayeredBFS {
                         this.currNode.getUID(),
                         Message.MessageType.LAYERED_BFS_NEW_PHASE,
                         this.currNode.getTreeDepth());
+
+                System.out.println("Layer " + this.currNode.getTreeDepth() + " complete\nStarting next layer");
 
                 this.childrenFound = false;
                 this.maxDegree = -1;
@@ -147,8 +150,7 @@ public class LayeredBFS {
             if (this.currNode.isNodeLeader()) {
                 this.currNode.increaseTreeDepth();
 
-                System.out.println("Layer 1 complete");
-                System.out.println("Layer 2 started");
+                System.out.println("Layer 1 complete\nStarting next layer");
 
                 Message newMsg = new Message(
                         this.currNode.getUID(),
