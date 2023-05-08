@@ -23,7 +23,7 @@ public class TCPServer extends Thread {
                     Message message = (Message) ois.readObject();
                     this.serverNode.addReceivedMessage(message);
                 } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
 
                 ois.close();

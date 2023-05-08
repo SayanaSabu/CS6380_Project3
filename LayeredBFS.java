@@ -1,5 +1,10 @@
 public class LayeredBFS {
     private Node currNode;
+
+    private boolean childrenFound = false;
+    private int maxDegree = -1;
+    private int phaseCompleteChildrenCount = 0;
+    private int searchAcceptNeighboursCount = 0;
     private int searchAckNeighboursCount = 0;
 
     public LayeredBFS(Node currNode) {
@@ -23,20 +28,22 @@ public class LayeredBFS {
         }
     }
 
-    private boolean didAllNeighboursReplyAck() {
-        int neighboursCount = this.currNode.getNeighbours().size();
+    private boolean didAllChildrenPhaseComplete() {
+        int childrenCount = this.currNode.getChildrenCount();
+        return this.phaseCompleteChildrenCount == childrenCount;
+    }
 
-        if (this.currNode.isNodeLeader()) {
-            return searchAckNeighboursCount == neighboursCount;
-        } else {
-            return searchAckNeighboursCount + 1 == neighboursCount;
-        }
+    private boolean didAllNeighboursAck() {
+        int neighboursCount = this.currNode.getNeighbours().size();
+        return this.searchAckNeighboursCount == neighboursCount;
     }
 
     private void handleIncomingMessages() {
         Message currMessage = this.currNode.popLatestReceivedMessage();
         if (currMessage.getSenderUID() == -1)
             return;
+
+        System.out.println("Received " + currMessage.getType() + " from " + currMessage.getSenderUID());
 
         switch (currMessage.getType()) {
             case LAYERED_BFS_SEARCH:
@@ -52,12 +59,62 @@ public class LayeredBFS {
                 this.handleNewPhaseMessage(currMessage);
                 break;
 
+            case LAYERED_BFS_NEW_PHASE_COMPLETE:
+                this.handleNewPhaseCompleteMessage(currMessage);
+                break;
+
             default:
-                this.currNode.addReceivedMessage(currMessage);
+                return;
+        }
+    }
+
+    private void handleNewPhaseCompleteMessage(Message msg) {
+        this.phaseCompleteChildrenCount += 1;
+
+        this.childrenFound = (this.childrenFound || msg.getChildrenFound());
+        this.maxDegree = Math.max(this.maxDegree, msg.getMaxDegree());
+
+        if (this.didAllChildrenPhaseComplete()) {
+            if (!this.currNode.isNodeLeader()) {
+                Message newMsg = new Message(
+                        this.currNode.getUID(),
+                        Message.MessageType.LAYERED_BFS_NEW_PHASE_COMPLETE,
+                        msg.getTreeDepth(),
+                        this.maxDegree,
+                        this.childrenFound);
+
+                this.currNode.messageParent(newMsg);
+            } else if (this.childrenFound) {
+                this.currNode.increaseTreeDepth();
+                this.currNode.setMaxDegree(this.maxDegree);
+
+                Message newMsg = new Message(
+                        this.currNode.getUID(),
+                        Message.MessageType.LAYERED_BFS_NEW_PHASE,
+                        this.currNode.getTreeDepth());
+
+                System.out.println("Layer " + this.currNode.getTreeDepth() + " complete\nStarting next layer");
+
+                this.childrenFound = false;
+                this.maxDegree = -1;
+                this.phaseCompleteChildrenCount = 0;
+                this.searchAcceptNeighboursCount = 0;
+                this.searchAckNeighboursCount = 0;
+
+                this.currNode.messageAllChildren(newMsg);
+            } else {
+                System.out.println("BFS complete");
+            }
         }
     }
 
     private void handleNewPhaseMessage(Message msg) {
+        this.childrenFound = false;
+        this.maxDegree = -1;
+        this.phaseCompleteChildrenCount = 0;
+        this.searchAcceptNeighboursCount = 0;
+        this.searchAckNeighboursCount = 0;
+
         if (msg.getTreeDepth() == this.currNode.getTreeLevel()) {
             Message newMsg = new Message(
                     this.currNode.getUID(),
@@ -65,13 +122,22 @@ public class LayeredBFS {
                     msg.getTreeDepth());
 
             this.currNode.messageAllNeighbours(newMsg);
-        } else {
+        } else if (this.currNode.getChildrenCount() > 0) {
             Message newMsg = new Message(
                     this.currNode.getUID(),
                     Message.MessageType.LAYERED_BFS_NEW_PHASE,
                     msg.getTreeDepth());
 
             this.currNode.messageAllChildren(newMsg);
+        } else {
+            Message newMsg = new Message(
+                    this.currNode.getUID(),
+                    Message.MessageType.LAYERED_BFS_NEW_PHASE_COMPLETE,
+                    this.currNode.getTreeLevel(),
+                    this.currNode.getDegree(),
+                    false);
+
+            this.currNode.messageParent(newMsg);
         }
     }
 
@@ -79,15 +145,15 @@ public class LayeredBFS {
         this.searchAckNeighboursCount += 1;
 
         if (msg.getType() == Message.MessageType.LAYERED_BFS_SEARCH_ACK_ACCEPTED) {
+            this.searchAcceptNeighboursCount += 1;
             this.currNode.addChildNode(msg.getSenderUID());
         }
 
-        if (this.didAllNeighboursReplyAck()) {
+        if (this.didAllNeighboursAck()) {
             if (this.currNode.isNodeLeader()) {
                 this.currNode.increaseTreeDepth();
 
-                System.out.println("Layer 1 complete");
-                System.out.println("Layer 2 started");
+                System.out.println("Layer 1 complete\nStarting next layer");
 
                 Message newMsg = new Message(
                         this.currNode.getUID(),
@@ -96,7 +162,14 @@ public class LayeredBFS {
 
                 this.currNode.messageAllChildren(newMsg);
             } else {
-                System.out.println("All neighbours ack");
+                Message newMsg = new Message(
+                        this.currNode.getUID(),
+                        Message.MessageType.LAYERED_BFS_NEW_PHASE_COMPLETE,
+                        this.currNode.getTreeLevel(),
+                        this.currNode.getDegree(),
+                        this.searchAcceptNeighboursCount > 0);
+
+                this.currNode.messageParent(newMsg);
             }
         }
     }
@@ -109,7 +182,7 @@ public class LayeredBFS {
             type = Message.MessageType.LAYERED_BFS_SEARCH_ACK_ACCEPTED;
         }
 
-        Message reply = new Message(this.currNode.getUID(), type);
-        this.currNode.messageNeighbour(reply, msg.getSenderUID());
+        Message ackMsg = new Message(this.currNode.getUID(), type);
+        this.currNode.messageNeighbour(ackMsg, msg.getSenderUID());
     }
 }

@@ -11,11 +11,15 @@ public class Node {
     private List<Message> receivedMessages = Collections.synchronizedList(new ArrayList<Message>());
     private int UID;
 
+    private List<Node> childNodes = Collections.synchronizedList(new ArrayList<Node>());
     private int leaderUID;
-
-    private ArrayList<Node> childNodes = new ArrayList<Node>();
-    private int depth = 0;
     private int parentUID = -1;
+
+    // Used only by leader
+    private int depth = 0;
+    private int maxDegree = -1;
+
+    // Used only by non-leader nodes
     private int treeLevel = -1;
 
     public Node() {
@@ -28,15 +32,19 @@ public class Node {
     }
 
     public void addChildNode(int childUID) {
-        Node childNode = this.neighbours.get(childUID);
-        this.childNodes.add(childNode);
+        synchronized (this.childNodes) {
+            Node childNode = this.neighbours.get(childUID);
+            this.childNodes.add(childNode);
 
-        String childrenStr = "";
-        for (Node child : this.childNodes) {
-            childrenStr += child.getUID() + " ";
+            this.setMaxDegree(this.getDegree());
         }
 
-        System.out.println("Updated children: " + childrenStr);
+        // String childrenStr = "";
+        // for (Node child : this.childNodes) {
+        // childrenStr += child.getUID() + " ";
+        // }
+
+        // System.out.println("Updated children: " + childrenStr);
     }
 
     public void addNeighbour(Node neighbour) {
@@ -58,11 +66,17 @@ public class Node {
     // return this.childNodes;
     // }
 
-    // public int getDegree() {
-    // return this.isNodeLeader()
-    // ? this.childNodes.size()
-    // : this.childNodes.size() + 1;
-    // }
+    public int getChildrenCount() {
+        synchronized (this.childNodes) {
+            return this.childNodes.size();
+        }
+    }
+
+    public int getDegree() {
+        return this.isNodeLeader()
+                ? this.getChildrenCount()
+                : this.getChildrenCount() + 1;
+    }
 
     public String getHostName() {
         return this.hostName;
@@ -121,8 +135,10 @@ public class Node {
     // }
 
     public void messageAllChildren(Message msg) {
-        for (Node child : this.childNodes) {
-            new TCPClient(this, child).sendMessage(msg);
+        synchronized (this.childNodes) {
+            for (Node child : this.childNodes) {
+                new TCPClient(this, child).sendMessage(msg);
+            }
         }
     }
 
@@ -143,9 +159,15 @@ public class Node {
     }
 
     public Message popLatestReceivedMessage() {
-        return this.receivedMessages.size() > 0
-                ? this.receivedMessages.remove(0)
-                : new Message();
+        synchronized (this.receivedMessages) {
+            return this.receivedMessages.size() > 0
+                    ? this.receivedMessages.remove(0)
+                    : new Message();
+        }
+    }
+
+    public void setMaxDegree(int newDegree) {
+        this.maxDegree = Math.max(this.maxDegree, newDegree);
     }
 
     public void setLeader(int leaderUID) {
