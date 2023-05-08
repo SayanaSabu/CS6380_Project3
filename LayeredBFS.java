@@ -4,6 +4,7 @@ public class LayeredBFS {
     private boolean childrenFound = false;
     private int maxDegree = -1;
     private int phaseCompleteNeighboursCount = 0;
+    private int searchAcceptNeighboursCount = 0;
     private int searchAckNeighboursCount = 0;
 
     public LayeredBFS(Node currNode) {
@@ -106,6 +107,7 @@ public class LayeredBFS {
                 this.childrenFound = false;
                 this.maxDegree = -1;
                 this.phaseCompleteNeighboursCount = 0;
+                this.searchAcceptNeighboursCount = 0;
                 this.searchAckNeighboursCount = 0;
 
                 this.currNode.messageAllChildren(newMsg);
@@ -119,6 +121,7 @@ public class LayeredBFS {
         this.childrenFound = false;
         this.maxDegree = -1;
         this.phaseCompleteNeighboursCount = 0;
+        this.searchAcceptNeighboursCount = 0;
         this.searchAckNeighboursCount = 0;
 
         if (msg.getTreeDepth() == this.currNode.getTreeLevel()) {
@@ -142,6 +145,7 @@ public class LayeredBFS {
         this.searchAckNeighboursCount += 1;
 
         if (msg.getType() == Message.MessageType.LAYERED_BFS_SEARCH_ACK_ACCEPTED) {
+            this.searchAcceptNeighboursCount += 1;
             this.currNode.addChildNode(msg.getSenderUID());
         }
 
@@ -164,7 +168,7 @@ public class LayeredBFS {
                         Message.MessageType.LAYERED_BFS_NEW_PHASE_COMPLETE,
                         this.currNode.getTreeLevel(),
                         this.currNode.getDegree(),
-                        this.currNode.getChildrenCount() > 0);
+                        this.searchAcceptNeighboursCount > 0);
 
                 this.currNode.messageParent(newMsg);
             }
