@@ -43,7 +43,8 @@ public class LayeredBFS {
         if (currMessage.getSenderUID() == -1)
             return;
 
-        System.out.println("Received " + currMessage.getType() + " from " + currMessage.getSenderUID());
+        // System.out.println("Received " + currMessage.getType() + " from " +
+        // currMessage.getSenderUID());
 
         switch (currMessage.getType()) {
             case LAYERED_BFS_SEARCH:
@@ -63,8 +64,25 @@ public class LayeredBFS {
                 this.handleNewPhaseCompleteMessage(currMessage);
                 break;
 
+            case LAYERED_BFS_COMPLETE:
+                this.handleBFSCompleteMessage(currMessage);
+                break;
+
             default:
                 return;
+        }
+    }
+
+    private void handleBFSCompleteMessage(Message msg) {
+        System.out.println("\nFinal connections"
+                + "\nParent: " + this.currNode.getParentUID()
+                + "\nChildren: " + this.currNode.getChildrenStr()
+                + "\nDegree: " + this.currNode.getDegree()
+                + "\nTree Level: " + this.currNode.getTreeLevel());
+
+        if (this.currNode.getChildrenCount() > 0) {
+            Message newMsg = new Message(this.currNode.getUID(), Message.MessageType.LAYERED_BFS_COMPLETE);
+            this.currNode.messageAllChildren(newMsg);
         }
     }
 
@@ -104,6 +122,16 @@ public class LayeredBFS {
                 this.currNode.messageAllChildren(newMsg);
             } else {
                 System.out.println("BFS complete");
+
+                System.out.println("\nFinal connections"
+                        + "\nParent: " + this.currNode.getParentUID()
+                        + "\nChildren: " + this.currNode.getChildrenStr()
+                        + "\nDegree: " + this.currNode.getDegree()
+                        + "\nTree Level: " + this.currNode.getTreeLevel()
+                        + "\nMax Degree: " + this.maxDegree);
+
+                Message newMsg = new Message(this.currNode.getUID(), Message.MessageType.LAYERED_BFS_COMPLETE);
+                this.currNode.messageAllChildren(newMsg);
             }
         }
     }
