@@ -86,6 +86,10 @@ public class Node {
         return this.hostName;
     }
 
+    public int getMaxDegree() {
+        return this.maxDegree;
+    }
+
     public ArrayList<Node> getNeighbours() {
         return new ArrayList<>(this.neighbours.values());
     }

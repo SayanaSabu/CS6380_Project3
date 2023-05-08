@@ -1,6 +1,7 @@
 public class LayeredBFS {
     private Node currNode;
 
+    private boolean bfsComplete = false;
     private boolean childrenFound = false;
     private int maxDegree = -1;
     private int phaseCompleteChildrenCount = 0;
@@ -23,7 +24,7 @@ public class LayeredBFS {
             this.currNode.messageAllNeighbours(msg);
         }
 
-        while (true) {
+        while (!this.bfsComplete) {
             this.handleIncomingMessages();
         }
     }
@@ -84,6 +85,8 @@ public class LayeredBFS {
             Message newMsg = new Message(this.currNode.getUID(), Message.MessageType.LAYERED_BFS_COMPLETE);
             this.currNode.messageAllChildren(newMsg);
         }
+
+        this.bfsComplete = true;
     }
 
     private void handleNewPhaseCompleteMessage(Message msg) {
@@ -128,10 +131,12 @@ public class LayeredBFS {
                         + "\nChildren: " + this.currNode.getChildrenStr()
                         + "\nDegree: " + this.currNode.getDegree()
                         + "\nTree Level: " + this.currNode.getTreeLevel()
-                        + "\nMax Degree: " + this.maxDegree);
+                        + "\nMax Degree: " + this.currNode.getMaxDegree());
 
                 Message newMsg = new Message(this.currNode.getUID(), Message.MessageType.LAYERED_BFS_COMPLETE);
                 this.currNode.messageAllChildren(newMsg);
+
+                this.bfsComplete = true;
             }
         }
     }
