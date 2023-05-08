@@ -27,6 +27,8 @@ public class LayeredBFS {
         while (!this.bfsComplete) {
             this.handleIncomingMessages();
         }
+
+        System.out.println("LayeredBFS complete");
     }
 
     private boolean didAllChildrenPhaseComplete() {
