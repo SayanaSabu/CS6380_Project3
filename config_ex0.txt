@@ -1,4 +1,4 @@
-# Number of nodes
+# number of nodes in the system
 7
 
 # UID Hostname Port
@@ -13,7 +13,7 @@
 # number of edges in the system
 9
 
-# List of edges and their weight, one per line. An edge is denoted
+# List of edges and their weight, one per line.
 (5,200) 5
 (5,8) 3
 (5,37) 10
@@ -25,4 +25,4 @@
 (9,200) 5
 
 # Distinguished node UID
-184
+200
